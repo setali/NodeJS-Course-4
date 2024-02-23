@@ -1,0 +1,23 @@
+<header>
+  <div class="menu">
+    <% const links = [{href: '/', label: 'Home'}, {href: '/about', label:
+    'About'}, {href: '/contact', label: 'Contact'}] %>
+    <ul>
+      <% for (const link of links) { %>
+      <li>
+        <a href="<%= link.href %>"><%= link.label %></a>
+      </li>
+      <% } %>
+    </ul>
+  </div>
+  <div class="menu">
+    <ul>
+      <li>
+        <a href="/login">Login</a>
+      </li>
+      <li>
+        <a href="/register">Register</a>
+      </li>
+    </ul>
+  </div>
+</header>

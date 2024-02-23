@@ -6,14 +6,14 @@ export function home (req, res) {
 }
 
 export function about (req, res) {
-  res.render('index', {
+  res.render('about', {
     title: 'About us',
     content: 'My About us'
   })
 }
 
 export function contact (req, res) {
-  res.render('index', {
+  res.render('contact', {
     title: 'Contact us',
     content: 'Please contact us'
   })

@@ -6,22 +6,8 @@ import errorHandler from './middlewares/error-handler'
 
 const app = express()
 
-app.engine('ali', (filePath, params, cb) => {
-  let view = fs.readFileSync(filePath, 'utf-8')
-
-  const entries = Object.entries(params)
-
-  entries.forEach(([key, value]) => {
-    if (typeof value === 'string') {
-      view = view.replace(`#${key}#`, value)
-    }
-  })
-
-  cb(null, view)
-})
-
 app.set('views', path.resolve(__dirname, 'views'))
-app.set('view engine', 'ali')
+app.set('view engine', 'ejs')
 
 app.use(express.static('public'))
 app.use(router)
