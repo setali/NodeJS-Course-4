@@ -1,10 +1,11 @@
+import Article from '../../models/article'
 import { BadRequestError, NotFoundError } from '../../utils/errors'
 import BaseController from '../base'
 
-const articles = []
-
 class ArticleController extends BaseController {
   list (req, res) {
+    const articles = Article.findAll()
+
     res.render('admin/article/list', {
       title: 'Article list',
       articles
@@ -14,7 +15,7 @@ class ArticleController extends BaseController {
   get (req, res) {
     const { id } = req.params
 
-    const article = articles.find(el => el.id === +id)
+    const article = Article.find(+id)
 
     if (!article) {
       throw new NotFoundError('Article not found')
@@ -39,7 +40,9 @@ class ArticleController extends BaseController {
       throw new BadRequestError('Title and Text is required')
     }
 
-    articles.push({ id: Date.now(), title, text })
+    const article = new Article({ title, text })
+
+    article.save()
 
     res.redirect('/admin/article')
   }
@@ -47,7 +50,7 @@ class ArticleController extends BaseController {
   edit (req, res) {
     const { id } = req.params
 
-    const article = articles.find(el => el.id === +id)
+    const article = Article.find(+id)
 
     if (!article) {
       throw new NotFoundError('Article not found')
@@ -68,7 +71,7 @@ class ArticleController extends BaseController {
 
     const { id } = req.params
 
-    const article = articles.find(el => el.id === +id)
+    const article = Article.find(+id)
 
     if (!article) {
       throw new NotFoundError('Article not found')
@@ -77,19 +80,21 @@ class ArticleController extends BaseController {
     article.title = title
     article.text = text
 
+    article.save()
+
     res.redirect('/admin/article')
   }
 
   remove (req, res) {
     const { id } = req.params
 
-    const articleIndex = articles.findIndex(el => el.id === +id)
+    const article = Article.find(+id)
 
-    if (articleIndex === -1) {
+    if (!article) {
       throw new NotFoundError('Article not found')
     }
 
-    articles.splice(articleIndex, 1)
+    article.remove()
 
     res.redirect('/admin/article')
   }
