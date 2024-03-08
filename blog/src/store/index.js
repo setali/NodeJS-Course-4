@@ -1,5 +1,26 @@
 import fs from 'fs'
 import path from 'path'
+import mysql from 'mysql2'
+
+const connection = mysql.createConnection({
+  host: '127.0.0.1',
+  port: 3304,
+  user: 'root',
+  password: '123456',
+  database: 'blog'
+})
+
+connection.connect()
+
+function query (q) {
+  return new Promise((resolve, reject) => {
+    connection.query(q, (err, result) => {
+      err ? reject(err) : resolve(result)
+    })
+  })
+}
+
+query('CREATE TABLE ali (id int)').then(console.log).catch(console.log)
 
 export class BaseModel {
   constructor ({ id, ...params }) {
