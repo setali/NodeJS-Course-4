@@ -3,8 +3,8 @@ import { BadRequestError, NotFoundError } from '../../utils/errors'
 import BaseController from '../base'
 
 class ArticleController extends BaseController {
-  list (req, res) {
-    const articles = Article.findAll()
+  async list (req, res) {
+    const articles = await Article.findAll()
 
     res.render('admin/article/list', {
       title: 'Article list',
@@ -12,10 +12,12 @@ class ArticleController extends BaseController {
     })
   }
 
-  get (req, res) {
+  async get (req, res) {
     const { id } = req.params
 
-    const article = Article.find(+id)
+    const article = await Article.find(+id)
+
+    console.log(article)
 
     if (!article) {
       throw new NotFoundError('Article not found')
@@ -33,7 +35,7 @@ class ArticleController extends BaseController {
     })
   }
 
-  add (req, res) {
+  async add (req, res) {
     const { title, text } = req.body
 
     if (!title || !text) {
@@ -42,15 +44,15 @@ class ArticleController extends BaseController {
 
     const article = new Article({ title, text })
 
-    article.save()
+    await article.save()
 
     res.redirect('/admin/article')
   }
 
-  edit (req, res) {
+  async edit (req, res) {
     const { id } = req.params
 
-    const article = Article.find(+id)
+    const article = await Article.find(+id)
 
     if (!article) {
       throw new NotFoundError('Article not found')
@@ -62,7 +64,7 @@ class ArticleController extends BaseController {
     })
   }
 
-  update (req, res) {
+  async update (req, res) {
     const { title, text } = req.body
 
     if (!title || !text) {
@@ -71,7 +73,7 @@ class ArticleController extends BaseController {
 
     const { id } = req.params
 
-    const article = Article.find(+id)
+    const article = await Article.find(+id)
 
     if (!article) {
       throw new NotFoundError('Article not found')
@@ -80,21 +82,21 @@ class ArticleController extends BaseController {
     article.title = title
     article.text = text
 
-    article.save()
+    await article.save()
 
     res.redirect('/admin/article')
   }
 
-  remove (req, res) {
+  async remove (req, res) {
     const { id } = req.params
 
-    const article = Article.find(+id)
+    const article = await Article.find(+id)
 
     if (!article) {
       throw new NotFoundError('Article not found')
     }
 
-    article.remove()
+    await article.remove()
 
     res.redirect('/admin/article')
   }

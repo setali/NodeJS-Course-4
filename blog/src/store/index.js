@@ -1,5 +1,3 @@
-import fs from 'fs'
-import path from 'path'
 import mysql from 'mysql2'
 
 const connection = mysql.createConnection({
@@ -20,13 +18,11 @@ function query (q) {
   })
 }
 
-query('CREATE TABLE ali (id int)').then(console.log).catch(console.log)
-
 export class BaseModel {
   constructor ({ id, ...params }) {
     this.id = id
 
-    this.fields.forEach(field => {
+    this.fieldNames.forEach(field => {
       this[field] = params[field]
     })
   }
@@ -35,101 +31,78 @@ export class BaseModel {
     return this.constructor.fields
   }
 
+  get fieldNames () {
+    return this.constructor.fields.map(field => field.name)
+  }
+
   get entityName () {
     return this.constructor.entityName
   }
 
-  static get data () {
-    return getData(this.entityName)
-  }
-
-  get data () {
-    return this.constructor.data
-  }
-
-  static set data (content) {
-    saveData(this.entityName, content)
-  }
-
-  set data (content) {
-    this.constructor.data = content
-  }
-
   save () {
-    const data = this.data
+    const q = this.id
+      ? `UPDATE ${this.entityName} SET ${this.fieldNames
+          .map(
+            name =>
+              `${name} = ${
+                this[name] === undefined ? 'NULL' : `'${this[name]}'`
+              }`
+          )
+          .join(', ')} WHERE id = ${this.id}`
+      : `INSERT INTO ${this.entityName} (${this.fieldNames.join(
+          ', '
+        )}) VALUES (${this.fieldNames
+          .map(name => (this[name] === undefined ? 'NULL' : `'${this[name]}'`))
+          .join(', ')})`
 
-    if (this.id) {
-      const entity = data.find(el => el.id === this.id)
-      this.fields.forEach(field => {
-        entity[field] = this[field]
-      })
-    } else {
-      const entity = { id: Date.now() }
-
-      this.fields.forEach(field => {
-        entity[field] = this[field]
-      })
-
-      data.push(entity)
-    }
-
-    this.data = data
+    query(q)
   }
 
   static findAll () {
-    return this.data
+    return query(`SELECT * FROM ${this.entityName}`)
   }
 
-  static find (id) {
-    const data = this.data.find(el => el.id === id)
+  static async find (id) {
+    const data = await query(
+      `SELECT * FROM ${this.entityName} WHERE id = ${id}`
+    )
 
-    return data ? new this(data) : undefined
+    return data[0] ? new this(data[0]) : undefined
   }
 
   static remove (id) {
-    const data = this.data
-
-    const dataIndex = data.findIndex(el => el.id === id)
-
-    if (dataIndex >= 0) {
-      data.splice(dataIndex, 1)
-      this.data = data
-    }
+    return query(`DELETE FROM ${this.entityName} WHERE id = ${id}`)
   }
 
   remove () {
     if (this.id) {
-      this.constructor.remove(this.id)
+      return this.constructor.remove(this.id)
     }
   }
 }
 
-function getFilePath (entityName) {
-  return path.resolve(__dirname, `${entityName}.data`)
-}
-
-function getData (entityName) {
-  const filePath = getFilePath(entityName)
-  const data = fs.readFileSync(filePath, 'utf-8')
-
-  return data ? JSON.parse(data) : []
-}
-
-function saveData (entityName, data) {
-  const filePath = getFilePath(entityName)
-  fs.writeFileSync(filePath, JSON.stringify(data))
-}
-
 export function init (Entity) {
-  if (!Entity.entityName) {
+  const { entityName, fields } = Entity
+
+  if (!entityName) {
     throw new Error('Entity needs entityName static property')
   }
 
-  const filePath = getFilePath(Entity.entityName)
-
-  if (!fs.existsSync(filePath)) {
-    saveData(Entity.entityName, [])
-  }
+  query(`SHOW TABLES LIKE '${entityName}'`).then(result => {
+    if (result.length === 0) {
+      query(`CREATE TABLE IF NOT EXISTS ${entityName} 
+      (id INT NOT NULL AUTO_INCREMENT, 
+      ${fields
+        .map(
+          field =>
+            `${field.name} ${field.type} ${field.nullable ? '' : 'NOT NULL'}`
+        )
+        .join(', ')}  
+          , PRIMARY KEY (id)
+        )
+      `).then(() => console.log(`Table ${entityName} created`))
+    }
+  })
 
   return Entity
 }
