@@ -1,0 +1,32 @@
+.form-item {
+  margin: 1rem;
+}
+
+button {
+  padding: 0.2rem 1rem;
+}
+
+.action {
+  color: blue;
+  text-decoration: underline;
+  display: block;
+}
+
+.action.inline {
+  display: inline;
+}
+
+.article .row .label {
+  font-weight: bold;
+}
+
+.action-form {
+  display: inline;
+}
+
+button.action {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}

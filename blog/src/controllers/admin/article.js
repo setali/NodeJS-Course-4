@@ -8,7 +8,8 @@ class ArticleController extends BaseController {
 
     res.render('admin/article/list', {
       title: 'Article list',
-      articles
+      articles,
+      user: req.user
     })
   }
 
@@ -23,13 +24,15 @@ class ArticleController extends BaseController {
 
     res.render('admin/article/show', {
       title: article.title,
-      article
+      article,
+      user: req.user
     })
   }
 
   create (req, res) {
     res.render('admin/article/create', {
-      title: 'Create Article'
+      title: 'Create Article',
+      user: req.user
     })
   }
 
@@ -58,7 +61,8 @@ class ArticleController extends BaseController {
 
     res.render('admin/article/edit', {
       title: `Edit article ${article.title}`,
-      article
+      article,
+      user: req.user
     })
   }
 

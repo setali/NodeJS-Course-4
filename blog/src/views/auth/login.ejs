@@ -1,0 +1,17 @@
+<%- include('../layouts/main-top.ejs') %>
+
+<form action="/login" method="post">
+  <div class="form-item">
+    <label for="username">Username:</label>
+    <input type="text" name="username" />
+  </div>
+  <div class="form-item">
+    <label for="password">Password:</label>
+    <input type="text" name="password" />
+  </div>
+  <div class="form-item">
+    <button type="submit">Login</button>
+  </div>
+</form>
+
+<%- include('../layouts/main-bottom.ejs') %>
