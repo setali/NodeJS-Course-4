@@ -17,8 +17,6 @@ class ArticleController extends BaseController {
 
     const article = await Article.find(+id)
 
-    console.log(article)
-
     if (!article) {
       throw new NotFoundError('Article not found')
     }
